@@ -12,6 +12,18 @@
 #include "timer.h"
 #include "util.h"
 
+#define F_CPU	16000000
+#define BAUD	9600
+#define BRC		((F_CPU/16/BAUD)-1)
+#define TX_BUFFER 128
+
+#define BIT_IS_SET(byte, bit) (byte & (1 << bit))
+#define BIT_IS_CLEAR(byte, bit) (!(byte & (1 << bit)))
+
+char serialBuffer[TX_BUFFER];
+uint8_t serialReadPos = 0;
+uint8_t SerialWritePos = 0;
+
 void main (void) {
 
 	// ...
