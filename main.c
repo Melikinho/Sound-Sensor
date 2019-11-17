@@ -24,14 +24,32 @@ char serialBuffer[TX_BUFFER];
 uint8_t serialReadPos = 0;
 uint8_t SerialWritePos = 0;
 
+void appendSerial(char c);
+void serialWrite(char c[]);
+
+
 void main (void) {
 
-	// ...
+	DDRB &= ~(1 << PB0);
+	PORTB |= (1 << PB0);
+
+	UBRR0H = BRC>>8;
+	UBRR0L = BRC;
+	sei();
+
 
 	while (1) {
 
-	// ...
 
 	}
+
 }
+
+
+void appendSerial(char c){
+}
+
+void serialWrite(char c[]){
+}
+
 
