@@ -40,16 +40,33 @@ void main (void) {
 
 	while (1) {
 
+	if(BIT_IS_CLEAR(PINB, PB0)) {
+		serialWrite("No voice detected\r\n");} 
+	else if(BIT_IS_SET(PINB, PB0)) {
+		serialWrite("voice detected!\r\n");
+			} 
+		_delay_ms(1000);
+		
+    }
+}
+
 
 	}
 
 }
 
 
-void appendSerial(char c){
+	void appendSerial(char c){
+	serialBuffer[SerialWritePos] =c;
 }
 
-void serialWrite(char c[]){
+	void serialWrite(char c[]){
+	for(uint8_t i = 0;i<strlen(c);i++){
+	//.....}
+}
+
+	ISR(USART_TX_vect){
+	if(serialReadPos != SerialWritePos)
 }
 
 
