@@ -5,14 +5,7 @@
 #include <string.h>
 #include <util/delay.h>
 
-#include "adc.h"
-#include "gpio.h"
-#include "i2c.h"
-#include "serial.h"
-#include "timer.h"
-#include "util.h"
-
-#define F_CPU	16000000
+//#define F_CPU	16000000
 #define BAUD	9600
 #define BRC		((F_CPU/16/BAUD)-1)
 #define TX_BUFFER 128
@@ -32,6 +25,9 @@ void main (void) {
 
 	DDRB &= ~(1 << PB0);
 	PORTB |= (1 << PB0);
+	
+	UBRR0H = BRC>>8;
+	UBRR0L = BRC;
 
 	UBRR0H = BRC>>8;
 	UBRR0L = BRC;
@@ -41,7 +37,8 @@ void main (void) {
 	while (1) {
 
 	if(BIT_IS_CLEAR(PINB, PB0)) {
-		serialWrite("No voice detected\r\n");} 
+		serialWrite("No voice detected\r\n");
+} 
 	else if(BIT_IS_SET(PINB, PB0)) {
 		serialWrite("voice detected!\r\n");
 			} 
@@ -51,22 +48,39 @@ void main (void) {
 }
 
 
-	}
-
-}
-
-
-	void appendSerial(char c){
+void appendSerial(char c)
+{
 	serialBuffer[SerialWritePos] =c;
+	SerialWritePos++;
+	if(SerialWritePos >= TX_BUFFER)
+	{
+		SerialWritePos = 0;
+	}
 }
 
-	void serialWrite(char c[]){
-	for(uint8_t i = 0;i<strlen(c);i++){
-	//.....}
+void serialWrite(char c[])
+{
+	for(uint8_t i = 0;i<strlen(c);i++)
+	{
+		appendSerial(c[i]);
+	}
+	if(UCSR0A & (1<< UDRE0))
+	{
+		UDR0 = 0;
+	}
 }
 
-	ISR(USART_TX_vect){
+ISR(USART_TX_vect)
+{
 	if(serialReadPos != SerialWritePos)
+	{
+		UDR0 = serialBuffer[serialReadPos];
+		serialReadPos++;
+		
+		if(serialReadPos >= TX_BUFFER)
+		{
+			serialReadPos++;
+		}
+	}
 }
-
 
